@@ -8,8 +8,6 @@ import config from "./constants";
 import { createSchema } from "./utils/createSchema";
 
 const main = async () => {
-  console.log('config.dbConnectionRetries', config.dbConnectionRetries)
-  console.log('config.timeoutBeforeRetry', config.timeoutBeforeRetry)
   let retries = Number(config.dbConnectionRetries);
   const retryTimeout = Number(config.timeoutBeforeRetry);
 

@@ -6,4 +6,6 @@ export class UserInput {
   username!: string;
   @Field(() => String)
   email!: string;
+  @Field(() => String)
+  password!: string;
 }

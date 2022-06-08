@@ -14,6 +14,7 @@ export const openDBConnection = async (drop = false): Promise<Connection> => {
     dropSchema: drop,
   });
 };
+
 export const closeDBConnection = async (): Promise<void> => {
   await getConnection().close();
 };
