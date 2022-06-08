@@ -9,7 +9,7 @@
     "start": "cd dist && NODE_ENV=production node dist/index.js",
     "build": "tsc",
     "test": "jest -c jest.config.js"
-  },
+  }, 
   "keywords": [],
   "author": "",
   "license": "ISC",
