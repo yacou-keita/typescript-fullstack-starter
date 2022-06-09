@@ -17,14 +17,18 @@ export class User extends BaseEntity {
 
   @Field(() => String)
   @Column()
-  username!: string;
+  firstname!: string;
 
   @Field(() => String)
   @Column()
-  email!: string;
+  lastname!: string;
 
-  @Column({ select: false })
-  password: string
+  @Field(() => String)
+  @Column()
+  username!: string;
+
+  @Column()
+  password!: string
 
   @Field(() => String)
   @CreateDateColumn()
