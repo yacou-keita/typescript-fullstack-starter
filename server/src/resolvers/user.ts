@@ -1,7 +1,7 @@
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
 import { UserInput, CredentialInput, UserResponse, } from "../types";
-import bcrypt from "bcryptjs"
+// import bcrypt from "bcryptjs"
 
 
 @Resolver()
@@ -69,7 +69,7 @@ export class userResolver {
       }
     }
 
-    input.password = await bcrypt.hash("password",8);
+    // input.password = await bcrypt.hash("password",8);
     const user = await User.create(input).save();
 
     return {user}
@@ -112,19 +112,19 @@ export class userResolver {
       }
     }
 
-    console.log('password', password)
-    console.log('user.password', user.password)
-    const isValidePassword = await bcrypt.compare(input.password, user.password)
-    console.log('isValidePassword', isValidePassword)
-    // if (!isValidePassword)
-    // {
-    //   return {
-    //     errors: [{
-    //       field: 'password',
-    //       message: "password is incorrect"
-    //     }]
-    //   }
-    // }
+   
+    // const isValidePassword = await bcrypt.compare(input.password, user.password)
+    const isValidePassword = password !== user.password
+    
+    if (isValidePassword)
+    {
+      return {
+        errors: [{
+          field: 'password',
+          message: "password is incorrect"
+        }]
+      }
+    }
     
     //req.session!.id = String(user.id)
    
