@@ -5,24 +5,30 @@ import { Box, Button } from "@chakra-ui/react";
 import { InputField } from "../components/InputField";
 import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../utils/createUrqlClient";
-import { useRegisterMutation } from "../generated/graphql";
+import { useLoginMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
+import { toErrorMap } from "../utils/toErrorMap";
 
 interface IRegisterProps {}
 
 const Login: NextPage<IRegisterProps> = () => {
   const router = useRouter();
-  const [, register] = useRegisterMutation();
+  const [, login] = useLoginMutation();
   return (
     <Wrapper variant="small">
       <Formik
         initialValues={{ username: "", password: "" }}
-        onSubmit={async (values) => {
-          const response = await register({ input: values });
-          const user = response.data?.register;
-          if (user) {
-            router.push(`user/${user.username}`);
+        onSubmit={async (values, {setErrors}) => {
+          const response = await login({ input: values });
+          const errors = response.data?.login.errors;
+          const user = response.data?.login.user;
+
+          if(errors){
+            setErrors(toErrorMap(errors))
+            return
           }
+
+          router.push(`user/${user?.username}`);
         }}
       >
         {({ isSubmitting }) => (

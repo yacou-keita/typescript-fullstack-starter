@@ -1,35 +1,15 @@
-import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
-import { UserInput, CredentialInput} from "../types";
+import { UserInput, CredentialInput, UserResponse, } from "../types";
 import bcrypt from "bcryptjs"
 
-
-
-
-@ObjectType()
-class FieldError {
-  @Field()
-  field:string
-  @Field()
-  message:string
-}
-
-@ObjectType()
-class UserResponse {
-  @Field(() => [FieldError], {nullable: true})
-  errors?: FieldError[]
-
-  @Field(() => User, {nullable: true})
-  user?: User
-}
 
 @Resolver()
 export class userResolver {
   
   @Mutation(() => UserResponse)
   async register(@Arg("input") input: UserInput): Promise<UserResponse> {
-    const {firstname, lastname} = input
-    const userAlreadyExiste = await User.findOne({ where: { username:input.username } });
+    const {firstname, lastname, username} = input
     
     if (!firstname)
     {
@@ -51,6 +31,15 @@ export class userResolver {
       }
     }
 
+    if(!username){
+      return {
+        errors: [{
+          field: 'username',
+          message: "lastname is require"
+        }]
+      }
+    }
+    const userAlreadyExiste = await User.findOne({ where: { username } });
     if (userAlreadyExiste)
     {
       return {
@@ -89,12 +78,30 @@ export class userResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg("input") input: CredentialInput,
-    // @Arg("password") password: string,
     @Ctx() {req}: any
     ): Promise<UserResponse> {
-      
+    const {password, username} = input
     const user = await User.findOne({ where: { username: input.username } });
-    console.log('user', user)
+    if (!username)
+    {
+      return {
+        errors: [{
+          field: 'username',
+          message: "username is require"
+        }]
+      }
+    }
+
+    if (!password)
+    {
+      return {
+        errors: [{
+          field: 'password',
+          message: "password is require"
+        }]
+      }
+    }
+
     if ( !user )
     {
       return {
@@ -105,7 +112,7 @@ export class userResolver {
       }
     }
 
-    console.log('password', input.password)
+    console.log('password', password)
     console.log('user.password', user.password)
     const isValidePassword = await bcrypt.compare(input.password, user.password)
     console.log('isValidePassword', isValidePassword)

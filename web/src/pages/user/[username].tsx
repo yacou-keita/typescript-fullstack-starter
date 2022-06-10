@@ -6,12 +6,13 @@ import { createUrqlClient } from "../../utils/createUrqlClient";
 import { Flex } from "@chakra-ui/react";
 
 const User: NextPage = () => {
+  
   const router = useRouter();
   const username = router.query.username as string;
   const [{ data, error, fetching }] = useGetByUsernameQuery({
     variables: { username },
   });
-  const email = data?.getByUsername?.email;
+  const fullname = `${data?.getByUsername?.firstname} ${data?.getByUsername?.lastname}`;
 
   if (fetching) {
     return (
@@ -35,7 +36,7 @@ const User: NextPage = () => {
         fontWeight="bold"
         fontSize="5xl"
       >
-        Welcome {email}
+        Welcome {fullname}
       </Flex>
     );
   }
