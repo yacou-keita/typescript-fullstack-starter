@@ -6,10 +6,9 @@ import { ApolloServer } from "apollo-server-express";
 import { openDBConnection } from "./utils/database";
 import config from "./constants";
 import { createSchema } from "./utils/createSchema";
-import * as redis from 'redis';
-import session  from "express-session";
-import connectRedis  from "connect-redis";
-import { MyContext } from "./types";
+import * as redis from "redis";
+import session from "express-session";
+import connectRedis from "connect-redis";
 
 
 const main = async () => {
@@ -30,49 +29,51 @@ const main = async () => {
     }
   }
 
-const app = express();
+  const app = express();
 
-const RedisStore = connectRedis(session)
-const redisClient = redis.createClient()
-redisClient.on('error', function (err) {
-  console.log('Could not establish a connection with redis. ' + err);
-});
-redisClient.on('connect', function (err) {
-  console.log('Connected to redis successfully');
-});
+  const RedisStore = connectRedis(session);
+  const redisClient = redis.createClient();
+  redisClient.on("error", function (err) {
+    console.log("Could not establish a connection with redis. " + err);
+  });
+  redisClient.on("connect", function (err) {
+    console.log("Connected to redis successfully");
+  });
 
-
-app.use(
-  session({
-    name:'qid',
-    store: new RedisStore({ 
-      client: redisClient,
-      disableTouch: true 
-    }),
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: false // cookie only works in https
-    },
-    saveUninitialized: false,
-    secret: "ksjjjsjjjsgyhuwgqbhjguwe",
-    resave: false,
-  })
-)
-
-  //set up cors with express cors middleware
-  app.use(
+   //set up cors with express cors middleware
+   app.use(
     cors({ origin: [config.frontend_url, config.studio_apollo_graphql_url] })
+  );
+
+  app.use(
+    session({
+      name: "qid",
+      store: new RedisStore({
+        client: redisClient,
+        disableTouch: true,
+      }),
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false, // cookie only works in https
+      },
+      saveUninitialized: false,
+      secret: "ksjjjsjjjsgyhuwgqbhjguwe",
+      resave: false,
+    })
   );
 
   const apolloServer = new ApolloServer({
     schema: await createSchema(),
-    context: ({req, res}):MyContext => ({req, res})
+    context: ({ req, res }) => ({nom:'hh', req, res }),
   });
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app, cors: false });
+  apolloServer.applyMiddleware({ 
+    app, 
+    cors: false, 
+  });
 
   app.listen(config.port, () => {
     console.log(`server started on port ${config.port}`);

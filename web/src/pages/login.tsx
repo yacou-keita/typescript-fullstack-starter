@@ -7,56 +7,26 @@ import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import { useRegisterMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
-import { toErrorMap } from "../utils/toErrorMap";
 
 interface IRegisterProps {}
 
-const Register: NextPage<IRegisterProps> = () => {
+const Login: NextPage<IRegisterProps> = () => {
   const router = useRouter();
   const [, register] = useRegisterMutation();
   return (
     <Wrapper variant="small">
       <Formik
-        initialValues={{
-          firstname: "",
-          lastname: "",
-          username: "",
-          password: "",
-        }}
-        onSubmit={async (values, {setErrors}) => {
+        initialValues={{ username: "", password: "" }}
+        onSubmit={async (values) => {
           const response = await register({ input: values });
-          const errors = response.data?.register.errors;
           const user = response.data?.register;
-      
-          if(errors){
-            setErrors(toErrorMap(errors))
-            return
-          }
-
           if (user) {
-            router.push(`login`);
+            router.push(`user/${user.username}`);
           }
-
         }}
       >
         {({ isSubmitting }) => (
           <Form>
-            <Box mt={4}>
-              <InputField
-                name="firstname"
-                placeholder="firstname"
-                label="firstname"
-                type="firstname"
-              />
-            </Box>
-            <Box mt={4}>
-              <InputField
-                name="lastname"
-                placeholder="lastname"
-                label="lastname"
-                type="lastname"
-              />
-            </Box>
             <InputField
               name="username"
               placeholder="username"
@@ -76,7 +46,7 @@ const Register: NextPage<IRegisterProps> = () => {
               isLoading={isSubmitting}
               colorScheme="blue"
             >
-              register
+              login
             </Button>
           </Form>
         )}
@@ -85,4 +55,4 @@ const Register: NextPage<IRegisterProps> = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Register);
+export default withUrqlClient(createUrqlClient, { ssr: true })(Login);

@@ -1,12 +1,12 @@
-mutation Register($input: UserInput!) {
-  register(input: $input) {
+mutation Login($input: UserInput!){
+  login(input: $input) {
     errors {
       field
       message
     }
     user {
-      id
-      firstname
+      id,
+      firstname,
       lastname
       username
       createdAt

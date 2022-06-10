@@ -18,6 +18,16 @@ export class UserInput {
   password!: string;
 }
 
+@InputType()
+export class CredentialInput {
+
+  @Field(() => String)
+  username!: string;
+
+  @Field(() => String)
+  password!: string;
+}
+
 export type MyContext = {
   req: Request 
   res: Response

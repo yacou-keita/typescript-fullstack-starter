@@ -1,6 +1,6 @@
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
-import { UserInput, MyContext} from "../types";
+import { UserInput, CredentialInput} from "../types";
 import bcrypt from "bcryptjs"
 
 
@@ -28,8 +28,29 @@ export class userResolver {
   
   @Mutation(() => UserResponse)
   async register(@Arg("input") input: UserInput): Promise<UserResponse> {
+    const {firstname, lastname} = input
     const userAlreadyExiste = await User.findOne({ where: { username:input.username } });
     
+    if (!firstname)
+    {
+      return {
+        errors: [{
+          field: 'firstname',
+          message: "firtname is require"
+        }]
+      }
+    }
+
+    if (!lastname)
+    {
+      return {
+        errors: [{
+          field: 'lastname',
+          message: "lastname is require"
+        }]
+      }
+    }
+
     if (userAlreadyExiste)
     {
       return {
@@ -67,12 +88,12 @@ export class userResolver {
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg("username") username: string,
-    @Arg("password") password: string,
-    @Ctx() {req}: MyContext
+    @Arg("input") input: CredentialInput,
+    // @Arg("password") password: string,
+    @Ctx() {req}: any
     ): Promise<UserResponse> {
       
-    const user = await User.findOne({ where: { username } });
+    const user = await User.findOne({ where: { username: input.username } });
     console.log('user', user)
     if ( !user )
     {
@@ -84,9 +105,9 @@ export class userResolver {
       }
     }
 
-    console.log('password', password)
+    console.log('password', input.password)
     console.log('user.password', user.password)
-    const isValidePassword = await bcrypt.compare(password, user.password)
+    const isValidePassword = await bcrypt.compare(input.password, user.password)
     console.log('isValidePassword', isValidePassword)
     // if (!isValidePassword)
     // {
