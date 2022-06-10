@@ -33,12 +33,6 @@ const main = async () => {
 
   const RedisStore = connectRedis(session);
   const redisClient = redis.createClient();
-  redisClient.on("error", function (err) {
-    console.log("Could not establish a connection with redis. " + err);
-  });
-  redisClient.on("connect", function (err) {
-    console.log("Connected to redis successfully");
-  });
 
    //set up cors with express cors middleware
    app.use(
@@ -66,7 +60,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await createSchema(),
-    context: ({ req, res }) => ({nom:'hh', req, res }),
+    context: ({ req, res }) => ({req, res }),
   });
 
   await apolloServer.start();
